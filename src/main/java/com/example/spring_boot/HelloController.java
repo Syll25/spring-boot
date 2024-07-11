@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HelloController {
 
-    @GetMapping("/")
+    @GetMapping("/index")
     public String index() {
         return "Greetings from Spring Boot!";  //get
     }
@@ -18,12 +18,12 @@ public class HelloController {
         return "Post: Greeting from Spring Boot"; //post
     }
 
-    @PutMapping("/")
+    @PutMapping("/put")
     public String putHello() {
-         return "Pust: Greeting from Spring Boot";
+         return "Put: Greeting from Spring Boot";
     }
 
-    @DeleteMapping("/")
+    @DeleteMapping("/del")
     public String deleteHello() {
         return "Delete: Greetings from Spring Boot";
     }
