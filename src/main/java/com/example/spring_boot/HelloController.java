@@ -6,16 +6,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping ("/api")
 public class HelloController {
 
     @GetMapping("/index")
     public String index() {
-        return "Greetings from Spring Boot!";  //get
+        return "Greetings from Spring Boot!";
     }
 
     @PostMapping("/hello")
     public String postHello() {
-        return "Post: Greeting from Spring Boot"; //post
+        return "Post: Greeting from Spring Boot";
     }
 
     @PutMapping("/put")
