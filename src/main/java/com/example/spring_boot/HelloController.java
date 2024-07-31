@@ -1,17 +1,18 @@
 package com.example.spring_boot;
 
+import org.apache.catalina.User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping ("/api")
+@RequestMapping ("/api/hello")
 public class HelloController {
 
     @GetMapping("/index")
     public String index() {
-        return "Greetings from Spring Boot!";
+        return "GET: Greetings from Spring Boot!";
     }
 
     @PostMapping("/hello")
@@ -29,4 +30,12 @@ public class HelloController {
         return "Delete: Greetings from Spring Boot";
     }
 
+    @PostMapping("/user")
+    public void createUser() {
+    }
+
+    @PostMapping("userController")
+    public void createUser(@RequestBody User user) {
+
+    }
 }

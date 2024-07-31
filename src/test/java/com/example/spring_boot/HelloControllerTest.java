@@ -22,7 +22,7 @@ public class HelloControllerTest {
 
     @Test
     public void getHello() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/api/hello").accept(MediaType.APPLICATION_JSON))
+        mvc.perform(MockMvcRequestBuilders.get("/api/index").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string(equalTo("GET: Greetings from Spring Boot!")));
     }
@@ -31,18 +31,18 @@ public class HelloControllerTest {
     public void postHello() throws Exception {
         mvc.perform(MockMvcRequestBuilders.post("/api/hello").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string(equalTo("POST: Greetings from Spring Boot!")));
+                .andExpect(content().string(equalTo("Post: Greetings from Spring Boot!")));
     }
     @Test
     public void putHello() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.put("/api/hello").accept(MediaType.APPLICATION_JSON))
+        mvc.perform(MockMvcRequestBuilders.put("/api/put").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string(equalTo("PUT: Greetings from Spring Boot!")));
+                .andExpect(content().string(equalTo("Put: Greetings from Spring Boot!")));
     }
     @Test
     public void deleteHello() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.delete("/api/hello").accept(MediaType.APPLICATION_JSON))
+        mvc.perform(MockMvcRequestBuilders.delete("/api/del").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string(equalTo("DELETE: Greetings from Spring Boot!")));
+                .andExpect(content().string(equalTo("Delete: Greetings from Spring Boot!")));
     }
 }
