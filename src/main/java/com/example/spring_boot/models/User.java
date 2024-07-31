@@ -1,4 +1,4 @@
-package com.example.spring_boot;
+package com.example.spring_boot.models;
 
 import jakarta.persistence.*;
 
@@ -17,6 +17,8 @@ public class User {
     public String email;
     @Column
     public String password;
+    @Column
+    public int age;
 
     @ManyToOne
     @JoinColumn(name = "address_id")
