@@ -29,13 +29,4 @@ public class HelloController {
     public String deleteHello() {
         return "Delete: Greetings from Spring Boot";
     }
-
-    @PostMapping("/user")
-    public void createUser() {
-    }
-
-    @PostMapping("userController")
-    public void createUser(@RequestBody User user) {
-
-    }
 }

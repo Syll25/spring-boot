@@ -24,7 +24,6 @@ public class User {
     @JoinColumn(name = "address_id")
     public Address address;
 
-<<<<<<< HEAD
     public Long getId() {
         return id;
     }
@@ -72,7 +71,4 @@ public class User {
     public void setAddress(Address address) {
         this.address = address;
     }
-
-=======
->>>>>>> origin/master
 }
