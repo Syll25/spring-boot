@@ -16,6 +16,7 @@ public class Address {
     public String city;
     @Column
     public String zipCode;
+<<<<<<< HEAD
 
     public Long getId() {
         return id;
@@ -49,4 +50,6 @@ public class Address {
         this.zipCode = zipCode;
     }
 
+=======
+>>>>>>> origin/master
 }
