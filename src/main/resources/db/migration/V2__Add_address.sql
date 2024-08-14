@@ -1,5 +1,5 @@
-CREATE TABLE addresses (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE address (
+    id BIGINT PRIMARY KEY,
     street VARCHAR(255),
     city VARCHAR(255),
     zip_code VARCHAR(255)

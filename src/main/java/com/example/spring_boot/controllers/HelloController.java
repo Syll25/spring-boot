@@ -1,4 +1,4 @@
-package com.example.spring_boot;
+package com.example.spring_boot.controllers;
 
 import org.apache.catalina.User;
 import org.springframework.web.bind.annotation.*;
