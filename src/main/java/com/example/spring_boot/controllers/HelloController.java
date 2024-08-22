@@ -1,6 +1,5 @@
 package com.example.spring_boot.controllers;
 
-import org.apache.catalina.User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,12 +29,4 @@ public class HelloController {
         return "Delete: Greetings from Spring Boot";
     }
 
-    @PostMapping("/user")
-    public void createUser() {
-    }
-
-    @PostMapping("userController")
-    public void createUser(@RequestBody User user) {
-
-    }
 }

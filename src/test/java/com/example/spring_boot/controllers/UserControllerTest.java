@@ -13,19 +13,5 @@ public class UserControllerTest {
 
     @Autowired
     private RestTemplate restTemplate;
-
-//    @Test
-//    public void testCreateUser() {
-//        String url = "http://localhost:8080/api/users";
-//
-//        User user = new User();
-//        user.name("Jan Kowalski");
-//        user.email("jan.kowalski@example.com");
-//        user.password("password");
-//
-//        ResponseEntity<User> response = restTemplate.postForEntity(url, user, User.class);
-//
-//        assertEquals(200, response.getStatusCodeValue());
-//        assertEquals("Jan", response.getBody().getFirstName());
-//    }
 }
+
