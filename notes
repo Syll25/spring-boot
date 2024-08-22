@@ -1,0 +1,109 @@
+curl -X POST http://localhost:8080/api/user -d '{"name”: "Jan Kowalski”, "email”: "jan.kowalski@gmail.com”, "password”: "p@ssword123”}’ -H 'Content-Type: application/json’
+
+
+Testy :
+package com.example.spring_boot.repositories;
+
+import com.example.spring_boot.models.Address;
+import com.example.spring_boot.models.User;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@DataJpaTest
+public class AddressRepositoryTest {
+
+    @Autowired
+    private AddressRepository addressRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Test
+    public void testSaveAddress() {
+        Address address = new Address();
+        address.setCity("Warsaw");
+        address.setStreet("Nowy Świat");
+        address.setZipCode("00-001");
+
+        Address savedAddress = addressRepository.save(address);
+
+        assertThat(savedAddress.getId()).isNotNull();
+        assertThat(savedAddress.getCity()).isEqualTo("Warsaw");
+        assertThat(savedAddress.getStreet()).isEqualTo("Nowy Świat");
+        assertThat(savedAddress.getZipCode()).isEqualTo("00-001");
+    }
+
+    @Test
+    public void testSaveUserWithAddress() {
+        Address address = new Address();
+        address.setCity("Warsaw");
+        address.setStreet("Nowy Świat");
+        address.setZipCode("00-001");
+
+        Address savedAddress = addressRepository.save(address);
+
+        User user = new User();
+        user.setName("Jan Kowalski");
+        user.setEmail("jan.kowalski@example.com");
+        user.setPassword("securePassword");
+        user.setAge(30);
+        user.setAddress(savedAddress);
+
+        User savedUser = userRepository.save(user);
+
+        assertThat(savedUser.getId()).isNotNull();
+        assertThat(savedUser.getAddress()).isEqualTo(savedAddress);
+    }
+
+    @Test
+    public void testSaveUserWithoutAddressShouldFail() {
+        User user = new User();
+        user.setName("Jan Kowalski");
+        user.setEmail("jan.kowalski@example.com");
+        user.setPassword("securePassword");
+        user.setAge(30);
+
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            userRepository.save(user);
+        });
+    }
+}
+
+
+package com.example.spring_boot;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+public class UserControllerTest {
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Test
+    public void testCreateUser() {
+        String url = "http://localhost:8080/api/users";
+
+        User user = new User();
+        user.setFirstName("Jan");
+        user.setLastName("Kowalski");
+        user.setEmail("jan.kowalski@example.com");
+        user.setPassword("password");
+
+        ResponseEntity<User> response = restTemplate.postForEntity(url, user, User.class);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Jan", response.getBody().getFirstName());
+    }
+}
