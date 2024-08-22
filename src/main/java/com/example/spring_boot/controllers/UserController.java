@@ -1,5 +1,6 @@
 package com.example.spring_boot.controllers;
 
+import com.example.spring_boot.services.types.LoginDTO;
 import com.example.spring_boot.services.types.UserDTO;
 import com.example.spring_boot.models.User;
 import com.example.spring_boot.services.UserService;
@@ -21,6 +22,11 @@ public class UserController {
     public User createUser(@RequestBody UserDTO userDTO) {
        return userService.createUser(userDTO);
     }
+
+    /*@PostMapping("/login")
+    public String login(@RequestBody LoginDTO userDTO) {
+        return userService.login(userDTO);
+    }*/
 
     @GetMapping
     public UserPageDTO getUserList(

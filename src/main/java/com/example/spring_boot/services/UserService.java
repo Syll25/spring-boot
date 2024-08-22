@@ -1,5 +1,6 @@
 package com.example.spring_boot.services;
 
+import com.example.spring_boot.services.types.LoginDTO;
 import com.example.spring_boot.services.types.UserDTO;
 import com.example.spring_boot.models.User;
 import com.example.spring_boot.repositories.UserRepository;
@@ -42,4 +43,11 @@ public class UserService {
         user.age = userDTO.age();
         return user;
     }
+
+    /*public String login(LoginDTO userDTO) {
+        // TODO
+        // 1. znaleźć użytkownika w bazie
+        // 2. wykorzystać password encoder do porównania hasła
+        // 3. zwrócić ciastko sesyjne
+    }*/
 }
