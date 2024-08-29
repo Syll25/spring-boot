@@ -1,13 +1,17 @@
 package com.example.spring_boot.controllers;
 
+import com.example.spring_boot.services.types.LoginDTO;
 import com.example.spring_boot.services.types.UserDTO;
 import com.example.spring_boot.models.User;
 import com.example.spring_boot.services.UserService;
 import com.example.spring_boot.services.types.UserPageDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,6 +24,17 @@ public class UserController {
     @PostMapping
     public User createUser(@RequestBody UserDTO userDTO) {
        return userService.createUser(userDTO);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
+        boolean loggedIn = userService.login(loginDTO, request);
+        if (loggedIn) {
+            return ResponseEntity.ok("Login successful");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid login");
+        }
+
     }
 
     @GetMapping
