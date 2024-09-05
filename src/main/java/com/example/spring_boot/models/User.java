@@ -19,7 +19,7 @@ public class User {
     @Column
     public String email;
 
-    @JsonIgnore
+    @JsonIgnore // do usunięcia - w widoku nie zwracamy modeli
     @Column(nullable = false)
     public String password;
 
