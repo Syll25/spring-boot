@@ -8,6 +8,7 @@ import com.example.spring_boot.services.types.UserPageDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,12 +35,14 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Transactional
     public UserDTO createUser(UserDTO userDTO) {
         User user = mapToUser(userDTO);
         userRepository.save(user);
         return new UserDTO(user.name, user.email, null, user.age);
     }
 
+    @Transactional
     public boolean login(LoginDTO loginDTO, HttpServletRequest request, HttpServletResponse response) {
         User user = userRepository.findByEmail(loginDTO.login())
                 .orElse(null);
