@@ -9,3 +9,9 @@ curl -b cookies.txt http://localhost:8080/api/user
 Dostep bez zalogowania
 curl http://localhost:8080/api/user
 
+curl -v -X POST http://localhost:8080/api/user/register -d '{"name": "Jan Kowalski", "email": "jan.kowalski@gmail.com", "password": "p@ssword123"}' -H 'Content-Type: application/json'
+curl -v -X POST -H "Content-Type: application/json" -d '{"login":"jan.kowalski@gmail.com","password":"p@ssword123"}' -c cookies.txt http://localhost:8080/api/user/login
+curl -v -X GET -c cookies.txt http://localhost:8080/api/user/getList
+
+curl -v -X GET -H "Content-Type: application/json" "http://localhost:8080/api/user/list" -H "Cookie: JSESSIONID=C7A87D1A1491E13022F53FC9A98E8EC0"
+

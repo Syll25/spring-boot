@@ -41,7 +41,7 @@ public class UserServiceTest {
         UserPageDTO result = userService.getList(pageable);
 
         assertEquals(1, result.users.size());
-        assertEquals("John Doe", result.users.get(0).name);
+        assertEquals("John Doe", result.users.get(0).name());
         assertEquals(0, result.currentPage);
         assertEquals(1, result.totalPages);
         assertEquals(1, result.totalItems);

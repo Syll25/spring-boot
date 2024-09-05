@@ -6,34 +6,55 @@ import com.example.spring_boot.models.User;
 import com.example.spring_boot.repositories.UserRepository;
 import com.example.spring_boot.services.types.UserPageDTO;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.security.authentication.AuthenticationManager;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
     @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private AuthenticationHandler authenticationHandler;
+    @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserRepository userRepository;
 
-    public User createUser(UserDTO userDTO) {
+    public UserDTO createUser(UserDTO userDTO) {
         User user = mapToUser(userDTO);
-        return userRepository.save(user);
+        userRepository.save(user);
+        return new UserDTO(user.name, user.email, null, user.age);
     }
 
-    public boolean login(LoginDTO loginDTO, HttpServletRequest request) {
+    public boolean login(LoginDTO loginDTO, HttpServletRequest request, HttpServletResponse response) {
         User user = userRepository.findByEmail(loginDTO.login())
                 .orElse(null);
         if (user != null && passwordEncoder.matches(loginDTO.password(), user.password)) {
             HttpSession session = request.getSession(true);
             session.setAttribute("user", user);
+            UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken
+                    .unauthenticated(loginDTO.login(), loginDTO.password());
+            token.setDetails(new WebAuthenticationDetails(request));
+            try {
+                Authentication authentication = authenticationManager.authenticate(token);
+                authenticationHandler.handleSuccessfulAuthentication(user.email, request, response, authentication);
+            } catch (AuthenticationException e) {
+                authenticationHandler.handleFailedAuthentication(user.email, request, response);
+            }
 
             return true;
 
@@ -44,10 +65,15 @@ public class UserService {
     public UserPageDTO getList(Pageable pageable) {
         Page<User> all = userRepository.findAll(pageable);
         List<User> users = all.getContent();
+
+        List<UserDTO> userDTOs = users.stream()
+                .map(user -> new UserDTO(user.getName(), user.getEmail(), null, user.getAge()))
+                .collect(Collectors.toList());
+
         int currentPage = pageable.getPageNumber();
         int totalPages = (int) Math.ceil((double) all.getTotalElements() / pageable.getPageSize());
 
-        return new UserPageDTO(users, currentPage, totalPages, all.getTotalElements());
+        return new UserPageDTO(userDTOs, currentPage, totalPages, all.getTotalElements());
     }
 
     private User mapToUser(UserDTO userDTO) {
