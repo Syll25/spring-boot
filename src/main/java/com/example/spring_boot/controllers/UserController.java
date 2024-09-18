@@ -1,8 +1,8 @@
 package com.example.spring_boot.controllers;
 
+import com.example.spring_boot.services.types.ListItemUserDTO;
 import com.example.spring_boot.services.types.LoginDTO;
 import com.example.spring_boot.services.types.UserDTO;
-import com.example.spring_boot.models.User;
 import com.example.spring_boot.services.UserService;
 import com.example.spring_boot.services.types.UserPageDTO;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,8 +26,13 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public UserDTO createUser(@RequestBody UserDTO userDTO) {
-       return userService.createUser(userDTO);
+    public ResponseEntity<Void> createUser(@RequestBody UserDTO userDTO) {
+        try {
+            userService.createUser(userDTO);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @PostMapping("/login")
@@ -53,8 +58,8 @@ public class UserController {
 
         UserPageDTO userPage = userService.getList(pageable);
 
-        List<UserDTO> safeUsers = userPage.users.stream()
-                .map(user -> new UserDTO(user.name(), user.email(), null, user.age()))
+        List<ListItemUserDTO> safeUsers = userPage.users.stream()
+                .map(user -> new ListItemUserDTO(user.name(), user.email(), user.age()))
                 .collect(Collectors.toList());
 
         return new UserPageDTO(safeUsers, userPage.currentPage, userPage.totalPages, userPage.totalItems);

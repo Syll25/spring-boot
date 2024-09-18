@@ -11,19 +11,29 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import org.springframework.test.web.reactive.server.EntityExchangeResult;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import java.util.Optional;
-
-import static org.mockito.Mockito.when;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 
 @AutoConfigureMockMvc
+@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SqlGroup(
+        {@Sql(scripts = "classpath:db/fixtures_init.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+                @Sql(scripts = "classpath:db/fixtures_clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)}
+)
 public class UserControllerTest {
 
     @Autowired
@@ -35,24 +45,40 @@ public class UserControllerTest {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    private WebTestClient webTestClient = WebTestClient
+            .bindToServer()
+            .baseUrl("http://localhost:8080")
+            .build();
     @Autowired
     private UserRepository userRepository;
+
+    @Container
+    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:15-alpine")
+            .withDatabaseName("testdb")
+            .withUsername("test")
+            .withPassword("test");
+
+    @DynamicPropertySource
+    static void registerPgProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
+    }
     @Test
     public void testLoginSuccess() throws Exception {
         String encodedPassword = passwordEncoder.encode("password");
 
         User user = createTestUser("user@example.com", encodedPassword, "User", 25);
 
-        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        LoginDTO loginDTO = new LoginDTO("test@user.com", "somepassword");
 
-        LoginDTO loginDTO = new LoginDTO("user@example.com", "password");
-
-        mvc.perform(MockMvcRequestBuilders.post("/api/user/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginDTO)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Login successful"));
-
+        webTestClient.post().uri("/api/user/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(loginDTO)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().exists("Set-Cookie")
+                .expectBody(String.class).isEqualTo("Login successful");
     }
 
     @Test
@@ -80,10 +106,30 @@ public class UserControllerTest {
 
     @Test
     public void testGetUserList() throws Exception {
+
+        LoginDTO loginDTO = new LoginDTO("test@user.com", "somepassword");
+        EntityExchangeResult<String> result = webTestClient.post().uri("/api/user/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(loginDTO)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().exists("Set-Cookie")
+                .expectBody(String.class).isEqualTo("Login successful")
+                .returnResult();
+
+        webTestClient.get().uri("/api/user/getList")
+                .cookie("JSESSIONID", result.getResponseCookies().getFirst("JSESSIONID").getValue())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.users[*].password").doesNotExist();
+    }
+
+    @Test
+    public void testGetUserListRespondsWith403WhenNotSignedIn() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/api/user/getList")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.users[*].password").doesNotExist());
+                .andExpect(status().isForbidden());
     }
 
     private String getUserName(User user) {

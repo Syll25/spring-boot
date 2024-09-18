@@ -1,5 +1,6 @@
 package com.example.spring_boot.services;
 
+import com.example.spring_boot.services.types.ListItemUserDTO;
 import com.example.spring_boot.services.types.LoginDTO;
 import com.example.spring_boot.services.types.UserDTO;
 import com.example.spring_boot.models.User;
@@ -70,14 +71,14 @@ public class UserService {
         Page<User> all = userRepository.findAll(pageable);
         List<User> users = all.getContent();
 
-        List<UserDTO> userDTOs = users.stream()
-                .map(user -> new UserDTO(user.getName(), user.getEmail(), null, user.getAge()))
+        List<ListItemUserDTO> listItemUserDTOS = users.stream()
+                .map(user -> new ListItemUserDTO(user.getName(), user.getEmail(), user.getAge()))
                 .collect(Collectors.toList());
 
         int currentPage = pageable.getPageNumber();
         int totalPages = (int) Math.ceil((double) all.getTotalElements() / pageable.getPageSize());
 
-        return new UserPageDTO(userDTOs, currentPage, totalPages, all.getTotalElements());
+        return new UserPageDTO(listItemUserDTOS, currentPage, totalPages, all.getTotalElements());
     }
 
     private User mapToUser(UserDTO userDTO) {

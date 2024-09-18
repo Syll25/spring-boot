@@ -1,6 +1,4 @@
 package com.example.spring_boot.models;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -19,7 +17,6 @@ public class User {
     @Column
     public String email;
 
-    @JsonIgnore
     @Column(nullable = false)
     public String password;
 
@@ -34,7 +31,6 @@ public class User {
     }
 
     public User() {
-
     }
 
     public String getName() {
